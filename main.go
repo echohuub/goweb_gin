@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"github.com/gin-contrib/cors"
 	"goweb_gin/controller"
 	"goweb_gin/tool"
 
@@ -18,7 +20,15 @@ func main() {
 		panic(err.Error())
 	}
 
+	tool.InitRedisStore(context.Background())
+
 	app := gin.Default()
+
+	// cors
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	app.Use(cors.New(corsConfig))
+
 	registerRouter(app)
 
 	app.Run(cfg.AppHost + ":" + cfg.AppPort)
