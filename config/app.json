@@ -1,29 +1,29 @@
 {
-	"app_name": "cloudrestaurant",
-	"app_mode": "debug",
-	"app_host": "localhost",
-	"app_port": "8090",
-	"sms": {
-		"sign_name": "xxx",
-		"template_code": "",
-		"app_key": "",
-		"app_secret": "",
-		"region_id": "cn-hangzhou"
-	},
-	"database": {
-		"driver": "mysql",
-		"user": "root",
-		"password": "123456",
-		"host": "127.0.0.1",
-		"port": "3306",
-		"db_name": "cloudrestaurant",
-		"charset": "utf8",
-		"show_sql": true
-	},
-	"redis": {
-		"addr": "127.0.0.1",
-		"port": "6379",
-		"password": "",
-		"db": 0
-	}
+  "app_name": "cloudrestaurant",
+  "app_mode": "debug",
+  "app_host": "localhost",
+  "app_port": "8090",
+  "sms": {
+    "sign_name": "xxx",
+    "template_code": "",
+    "app_key": "",
+    "app_secret": "",
+    "region_id": "cn-hangzhou"
+  },
+  "database": {
+    "driver": "mysql",
+    "user": "root",
+    "password": "123456",
+    "host": "127.0.0.1",
+    "port": "3306",
+    "db_name": "cloudrestaurant",
+    "charset": "utf8",
+    "show_sql": true
+  },
+  "redis": {
+    "addr": "127.0.0.1",
+    "port": "6379",
+    "password": "",
+    "db": 0
+  }
 }
