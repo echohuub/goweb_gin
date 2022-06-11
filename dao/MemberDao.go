@@ -65,3 +65,12 @@ func (md *MemberDao) UpdateMember(userId int64, fileName string) int64 {
 	}
 	return result
 }
+
+func (md *MemberDao) QueryMemberById(userId int64) *model.Member {
+	member := model.Member{}
+	_, err := md.Where(" id = ?", userId).Get(&member)
+	if err != nil {
+		return nil
+	}
+	return &member
+}

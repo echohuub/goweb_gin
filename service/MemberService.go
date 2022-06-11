@@ -7,6 +7,7 @@ import (
 	"goweb_gin/param"
 	"goweb_gin/tool"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -75,4 +76,13 @@ func (ms *MemberService) UploadAvatar(userId int64, fileName string) string {
 		return ""
 	}
 	return fileName
+}
+
+func (ms *MemberService) GetUserInfo(userId string) *model.Member {
+	id, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil
+	}
+	memberDao := dao.MemberDao{tool.DBEngine}
+	return memberDao.QueryMemberById(int64(id))
 }

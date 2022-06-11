@@ -22,6 +22,7 @@ func (mc *MemberController) Router(engine *gin.Engine) {
 	engine.GET("/api/verifyCaptcha", mc.verifyCaptcha)
 	engine.POST("/api/loginName", mc.nameLogin)
 	engine.POST("/api/upload/avatar", mc.uploadAvatar)
+	engine.GET("/api/userinfo", mc.GetUserInfo)
 }
 
 func (mc *MemberController) sendSmsCode(context *gin.Context) {
@@ -56,6 +57,9 @@ func (*MemberController) smsLogin(context *gin.Context) {
 			tool.Fail(context, "登录失败")
 			return
 		}
+
+		context.SetCookie(tool.CookieName, strconv.Itoa(int(member.Id)), 10*60, "/", "localhost", true, true)
+
 		tool.Success(context, member)
 		return
 	}
@@ -116,6 +120,7 @@ func (*MemberController) nameLogin(context *gin.Context) {
 		tool.Fail(context, "登录失败")
 		return
 	}
+	context.SetCookie(tool.CookieName, strconv.Itoa(int(member.Id)), 10*60, "/", "localhost", true, true)
 	tool.Success(context, member)
 }
 
@@ -155,4 +160,28 @@ func (*MemberController) uploadAvatar(context *gin.Context) {
 	}
 	// 5.返回结果
 	tool.Fail(context, "上传失败")
+}
+
+func (*MemberController) GetUserInfo(context *gin.Context) {
+	cookie, err := tool.CookieAuth(context)
+	if err != nil {
+		context.Abort()
+		tool.Fail(context, "未登录")
+		return
+	}
+	memberService := service.MemberService{}
+	member := memberService.GetUserInfo(cookie.Value)
+	if member == nil {
+		tool.Fail(context, "用户不存在")
+		return
+	}
+	tool.Success(context, map[string]interface{}{
+		"id":            member.Id,
+		"user_name":     member.UserName,
+		"mobile":        member.Mobile,
+		"register_time": member.RegisterTime,
+		"avatar":        member.Avatar,
+		"balance":       member.Balance,
+		"city":          member.City,
+	})
 }
