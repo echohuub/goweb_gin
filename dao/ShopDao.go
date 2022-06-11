@@ -30,3 +30,12 @@ func (sd *ShopDao) QueryShopList(longitude, latitude float64, keyword string) []
 	}
 	return list
 }
+
+func (sd *ShopDao) QueryServiceByShopId(shopId int64) []model.Service {
+	var services []model.Service
+	err := sd.Table("service").Join("INNER", "shop_service", "service.id == shop_service.service_id and shop_service.shop_id = ?", shopId).Find(&services)
+	if err != nil {
+		return nil
+	}
+	return services
+}

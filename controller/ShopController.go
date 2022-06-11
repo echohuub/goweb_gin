@@ -25,6 +25,9 @@ func (sc *ShopController) GetShopList(context *gin.Context) {
 
 	shopService := service.ShopService{}
 	list := shopService.GetShopList(longitude, latitude)
+	for _, shop := range list {
+		shop.Supports = shopService.GetService(shop.Id)
+	}
 	tool.Success(context, list)
 }
 

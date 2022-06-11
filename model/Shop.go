@@ -18,4 +18,6 @@ type Shop struct {
 	RatingCount int64   `xorm:"int" json:"rating_count"`
 
 	RecentOrderNum int64 `xorm:"int" json:"recent_order_num"`
+
+	Supports []Service `xorm:"" json:"supports"`
 }
