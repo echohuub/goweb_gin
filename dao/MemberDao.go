@@ -55,3 +55,13 @@ func (md *MemberDao) Query(name string, password string) *model.Member {
 	}
 	return &member
 }
+
+func (md *MemberDao) UpdateMember(userId int64, fileName string) int64 {
+	member := model.Member{Avatar: fileName}
+	result, err := md.Where(" id = ?", userId).Update(&member)
+	if err != nil {
+		fmt.Println(err.Error())
+		return 0
+	}
+	return result
+}

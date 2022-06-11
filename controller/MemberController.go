@@ -1,11 +1,15 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"goweb_gin/model"
 	"goweb_gin/param"
 	"goweb_gin/service"
 	"goweb_gin/tool"
+	"strconv"
+	"time"
 )
 
 type MemberController struct {
@@ -17,6 +21,7 @@ func (mc *MemberController) Router(engine *gin.Engine) {
 	engine.GET("/api/captcha", mc.captcha)
 	engine.GET("/api/verifyCaptcha", mc.verifyCaptcha)
 	engine.POST("/api/loginName", mc.nameLogin)
+	engine.POST("/api/upload/avatar", mc.uploadAvatar)
 }
 
 func (mc *MemberController) sendSmsCode(context *gin.Context) {
@@ -45,6 +50,12 @@ func (*MemberController) smsLogin(context *gin.Context) {
 	service := service.MemberService{}
 	member := service.SmsLogin(smsLoginParam)
 	if member != nil {
+		jsonStr, _ := json.Marshal(member)
+		err := tool.SetSession(context, "user_"+string(member.Id), jsonStr)
+		if err != nil {
+			tool.Fail(context, "登录失败")
+			return
+		}
 		tool.Success(context, member)
 		return
 	}
@@ -99,5 +110,49 @@ func (*MemberController) nameLogin(context *gin.Context) {
 		tool.Fail(context, "登录失败")
 		return
 	}
+	jsonStr, _ := json.Marshal(member)
+	err = tool.SetSession(context, "user_"+string(member.Id), jsonStr)
+	if err != nil {
+		tool.Fail(context, "登录失败")
+		return
+	}
 	tool.Success(context, member)
+}
+
+func (*MemberController) uploadAvatar(context *gin.Context) {
+	// 1.解析上传参数：file、user_id
+	userId := context.PostForm("user_id")
+	fmt.Println(userId)
+	file, err := context.FormFile("avatar")
+	if err != nil || userId == "" {
+		tool.Fail(context, "参数解析失败")
+		return
+	}
+
+	// 2.判断user_id对应的用户是否已经登录
+	sess := tool.GetSession(context, "user_"+userId)
+	if sess == nil {
+		tool.Fail(context, "参数不合法")
+		return
+	}
+	var member model.Member
+	json.Unmarshal(sess.([]byte), &member)
+
+	// 3.file保存到本地
+	fileName := "./uploadfile/" + strconv.FormatInt(time.Now().Unix(), 10) + file.Filename
+	err = context.SaveUploadedFile(file, fileName)
+	if err != nil {
+		tool.Fail(context, "头像更新失败")
+		return
+	}
+
+	// 4.将保存后的文件本地路径，保存到用户表
+	memberService := service.MemberService{}
+	path := memberService.UploadAvatar(member.Id, fileName[1:])
+	if path != "" {
+		tool.Success(context, "http://localhost:8090"+path)
+		return
+	}
+	// 5.返回结果
+	tool.Fail(context, "上传失败")
 }

@@ -29,6 +29,8 @@ func main() {
 	corsConfig.AllowAllOrigins = true
 	app.Use(cors.New(corsConfig))
 
+	tool.InitSession(app)
+
 	registerRouter(app)
 
 	app.Run(cfg.AppHost + ":" + cfg.AppPort)
