@@ -44,3 +44,14 @@ func (md *MemberDao) InsertMember(member model.Member) int64 {
 	}
 	return result
 }
+
+func (md *MemberDao) Query(name string, password string) *model.Member {
+	var member = model.Member{}
+	password = tool.EncoderSha256(password)
+	_, err := md.Where(" user_name = ? and password = ?", name, password).Get(&member)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil
+	}
+	return &member
+}

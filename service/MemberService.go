@@ -48,3 +48,22 @@ func (ms *MemberService) SendCode(phone string) bool {
 	result := memberDao.InsertCode(smsCode)
 	return result > 0
 }
+
+func (ms *MemberService) Login(name string, password string) *model.Member {
+	// 1.使用用户名查询用户，如果存在就直接返回
+	md := dao.MemberDao{tool.DBEngine}
+	member := md.Query(name, password)
+	if member.Id != 0 {
+		return member
+	}
+	// 2.如果不存在，则注册新用户并返回
+	user := model.Member{}
+	user.UserName = name
+	user.Password = tool.EncoderSha256(password)
+	user.RegisterTime = time.Now().Unix()
+
+	result := md.InsertMember(user)
+	user.Id = result
+
+	return &user
+}
